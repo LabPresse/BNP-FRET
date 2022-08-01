@@ -16,7 +16,7 @@ Once the julia language has been installed, some essential julia packages are re
 
 ```add Distributions LinearAlgebra Statistics Plots StatsPlots KernelDensity HDF5```
 
-See the image below for an example of the package installation process:
+See the image below for an example of the package installation process in julia REPL:
 
 ![Screenshot from 2022-08-01 13-00-40](https://user-images.githubusercontent.com/87823118/182234995-db174ea5-3157-4b8c-98b9-dd0aeabc4399.png)
 
