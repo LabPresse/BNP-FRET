@@ -72,6 +72,11 @@ minimum, median, maximum acceptance rate = 60.72308956450287%  61.75020542317173
 =================================================================
 ```
 
+
+
+
+
+
 Furthemore, the sampler output can be visualized using the plotting options in the "input_parameters.jl" file. Visualization of the sampler output makes it easy to identify when the posterior converges and the most probable model (number of system states). Furthermore, it shows a bivariate distribution for FRET efficiencies and escape rates (sum of all the rates out of a state or in a rate matrix row).
 
 ![Screenshot from 2022-08-01 02-30-28](https://user-images.githubusercontent.com/87823118/182118887-f2f7426d-0508-4e8f-8bf3-dd0846466f22.png)
