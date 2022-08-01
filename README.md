@@ -55,7 +55,10 @@ The functions used to perform all the computations are organized in a hierarchic
 
 
 
-The code output below shows the MCMC (Markov Chain Monte Carlo) iteration number (number of samples generated), number of active system states, labels for all the active loads, the excitation rate (related to laser power), rate matrix for the biomolecule of interest with FRET efficiencies on the diagonal instead of zeros, logarithm of the full joint posterior, and acceptance rates. All the samples until the full joint posterior reaches convergence (maximum) should be ignored. This initial period is also known as burn-in. For efficient exploration of the parameter space, tune the covariance values for the proposal distributions in such a way that the acceptance rates stay between 30 and 60% approximately.
+An example of code output below shows the MCMC (Markov Chain Monte Carlo) iteration number (number of samples generated), number of active system states, labels for all the active loads, the excitation rate (related to laser power), rate matrix for the biomolecule of interest with FRET efficiencies on the diagonal instead of zeros, logarithm of the full joint posterior, and acceptance rates. We used smFRET data from experiments studying binding and unbinding of intrinsically disordered proteins (immobilized ACTR and freely-diffusing NCBD) in presence of 36 % ethylene glycol to generate this output.
+
+https://www.pnas.org/doi/full/10.1073/pnas.1921617117
+
 
 ```
 =================================================================
@@ -88,7 +91,8 @@ minimum, median, maximum acceptance rate = 60.72308956450287%  61.75020542317173
 
 
 
-Furthemore, the sampler output can be visualized using the plotting options in the "input_parameters.jl" file. Visualization of the sampler output makes it easy to identify when the posterior converges and the most probable model (number of system states). Furthermore, it shows a bivariate distribution for FRET efficiencies and escape rates (sum of all the rates out of a state or in a rate matrix row).
+Furthemore, the sampler output can be visualized using the plotting options in the "input_parameters.jl" file. Visualization of the sampler output makes it easy to identify when the posterior converges and the most probable model (number of system states). Furthermore, it shows a bivariate distribution for FRET efficiencies and escape rates (sum of all the rates out of a state or in a rate matrix row). All the samples until the full joint posterior reaches convergence (maximum value) should be ignored. This initial period is also known as burn-in. For efficient exploration of the parameter space, tune the covariance values for the proposal distributions in such a way that the acceptance rates stay between 30 and 60% approximately.
+
 
 ![Screenshot from 2022-08-01 02-30-28](https://user-images.githubusercontent.com/87823118/182118887-f2f7426d-0508-4e8f-8bf3-dd0846466f22.png)
 
