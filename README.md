@@ -1,6 +1,6 @@
 # BNP-FRET: Analyze single photon smFRET data in a Bayesian nonparametrics (BNP) paradigm.
 
-BNP-FRET is a suite of software tools to analyze single photon smFRET data under continuous and pulsed illumination. It helps learn distributions over parameters of interest: the number of states a biomolecule transitions through and associated transition rates. The tools can be used in a simple plug and play manner. Check the following set of papers to see details of all the mathematics involved in the development of BNP-FRET:
+BNP-FRET is a suite of software tools to analyze single photon smFRET data under continuous and pulsed illumination. It implements Markov chain Monte Carlo (MCMC) algorithms to learn distributions over parameters of interest: the number of states a biomolecule transitions through and associated transition rates. The tools can be used in a simple plug and play manner. Check the following set of papers to see details of all the mathematics involved in the development of BNP-FRET:
 
 https://biorxiv.org/cgi/content/short/2022.07.20.500887v1
 
@@ -8,15 +8,15 @@ https://biorxiv.org/cgi/content/short/2022.07.20.500888v1
 
 https://biorxiv.org/cgi/content/short/2022.07.20.500892v1
 
-All the codes are written in Julia language for high performance and its open-source/free availability. Julia also allows easy parallelization of all the codes. To install julia, please download and install julia language from their official website (see below) for your operating system or use your package manager. The current version of the code has been successfully tested on Ubuntu 20.04, macOS 12, and Windows ..
+All the codes are written in Julia language for high performance/speed and its open-source/free availability. Julia also allows easy parallelization of all the codes. To install julia, please download and install julia language from their official website (see below) for your operating system or use your package manager. The current version of the code has been successfully tested on Ubuntu 20.04, macOS 12, and Windows ..
 
 https://julialang.org/
 
-Once the julia language has been installed, some essential julia packages are required to be added that help simplify linear algebra and statistical calculations, and plotting. To add these package via julia REPL, first enter the julia package manager by executing "]" command in the REPL. Then simply execute the following command to add all these packages. 
+Once the julia language has been installed, some essential julia packages are required to be added that help simplify linear algebra and statistical calculations, and plotting. To add these package via julia REPL, first enter the julia package manager by executing "]" command in the REPL. Then simply execute the following command to install all these packages at the same time. 
 
 ```add Distributions LinearAlgebra Statistics Plots StatsPlots KernelDensity HDF5```
 
-See the image below for an example of the package installation process in julia REPL:
+Also, see the image below for an example of the package installation process in julia REPL.
 
 ![Screenshot from 2022-08-01 13-00-40](https://user-images.githubusercontent.com/87823118/182234995-db174ea5-3157-4b8c-98b9-dd0aeabc4399.png)
 
@@ -27,31 +27,31 @@ The functions used to perform all the computations are organized in a hierarchic
 
 1. get_FRET_data(): Used to obtain photon arrival data and corresponding detection channels from input files in HDF5 format. It can be easily modified if other file formats are desired.
 
-2. sampler():
+2. sampler(): Used to generate samples for parameters of interest using Gibbs algorithm.
 
-3. check_for_existing_mcmc_data():
+3. check_for_existing_mcmc_data(): Called by sampler() to searche for previously generate MCMC samples stored in HDF5 format files in the working directory.
 
-4. initialize_params():
+4. initialize_params(): Called by sampler() to initialize all the parameters of interest to constitute the first set of MCMC samples.
 
-5. log_likelihood():
+5. get_log_likelihood(): Called by sampler() to computes the logarithm of the likelihood function for the FRET data.
 
-   get_generator():
+   get_generator(): Called by get_log_likelihood() to obtain the full generator matrix containing photophysical and biomolecular transition rates.
    
-   get_rho():
+   get_rho(): Called by get_log_likelihood() to obtain the initial probability vector associated with the generator matrix.
    
-   non_radiative_propagator:
+   non_radiative_propagator: Called by get_log_likelihood() to compute propagators during periods when no photons are detected.
    
-   radiative_propagator:
+   radiative_propagator: Called by get_log_likelihood() to compute propagators at photon arrival times.
 
-6. log_prior_rates():
+6. get_log_prior_rates(): Called by sampler() to obtain logarithm of prior density at a parameter's value.
 
-7. get_log_full_posterior():
+7. get_log_full_posterior(): Called by sampler() to get full joint posterior. Sums logarithms of likelihood and all the priors.
 
-8. save_mcmc_data():
+8. save_mcmc_data(): Called by sampler() to save output to files.
 
-9. print_and_plotting():
+9. print_and_plotting(): Called by sampler() to print values on standard out (terminal/screen). It also generates plots (shown in the example below).
 
-10. propose_params():
+10. propose_params(): Called by sampler() in the for loop to propose new samples for each parameter that may or may not be accepted in the Metropolis-Hastings (MH) step.
 
 
 
