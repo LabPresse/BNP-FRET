@@ -8,7 +8,18 @@ https://biorxiv.org/cgi/content/short/2022.07.20.500888v1
 
 https://biorxiv.org/cgi/content/short/2022.07.20.500892v1
 
-All the codes are written in Julia language for high performance and its open-source/free availability. Julia also allows easy parallelization of all the codes.
+All the codes are written in Julia language for high performance and its open-source/free availability. Julia also allows easy parallelization of all the codes. To install julia, please download and install julia language from their official website (see below) for your operating system or use your package manager. The current version of the code has been successfully tested on Ubuntu 20.04, macOS 12, and Windows ..
+
+https://julialang.org/
+
+Once the julia language has been installed, some essential julia packages are required to be added that help simplify linear algebra and statistical calculations, and plotting. To add these package via julia REPL, first enter the julia package manager by executing "]" command in the REPL. Then simply execute the following command to add all these packages. 
+
+```add Distributions LinearAlgebra Statistics Plots StatsPlots KernelDensity HDF5```
+
+See the image below for an example of the package installation process:
+
+![Screenshot from 2022-08-01 13-00-40](https://user-images.githubusercontent.com/87823118/182234995-db174ea5-3157-4b8c-98b9-dd0aeabc4399.png)
+
 
 Each specialization of BNP-FRET (continuous or pulsed illumination) is organized in such a way that all the user input is accomplished via the "input_parameters.jl" file. It can be used to provide file names for experimental FRET data and sampler output, background rates for each detection channel, crosstalk probabilities, and plotting options. See the respective files for more details (they are well-commented).
 
