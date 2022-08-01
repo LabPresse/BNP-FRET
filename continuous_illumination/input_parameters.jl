@@ -2,10 +2,7 @@
 # All the time scales are set in nanosecond units.
 
 # Directory containing FRET traces
-working_directory =
-         "/home/singularity/dropbox/bayesianCodes/julia/multiFRET/BNP-FRET/"
-#working_directory =
-#        "/home/mbgnjasb/Dropbox (ASU)/bayesianCodes/julia/multiFRET/BNP-FRET/"
+working_directory = "/home/username/BNP-FRET/"
 
 
 # Input data files are named using the convention "biomolecule_label.h5".
