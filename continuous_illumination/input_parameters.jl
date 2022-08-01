@@ -1,10 +1,11 @@
 # Global input parameters for continuous illumination edition of BNP-FRET.
 # All the time scales are set in nanosecond units.
 
-# Directory containing FRET traces. Please change according to your
-# computer.
+# Directory containing FRET traces
 working_directory =
-        "/home/mbgnjasb/BNP-FRET/"
+         "/home/singularity/dropbox/bayesianCodes/julia/multiFRET/BNP-FRET/"
+#working_directory =
+#        "/home/mbgnjasb/Dropbox (ASU)/bayesianCodes/julia/multiFRET/BNP-FRET/"
 
 
 # Input data files are named using the convention "biomolecule_label.h5".

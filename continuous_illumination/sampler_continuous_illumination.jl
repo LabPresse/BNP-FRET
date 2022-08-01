@@ -1,8 +1,18 @@
-# Bayesian Analysis of Single-FRET with Continuous Illumination
+# BNP-FRET (Continuous Illumination)
+
+###########################################################
+# Copyright (C) 2022 Presse Lab - All Rights Reserved
+# 
+# Author: Ayush Saurabh
+#
+# You may use, distribute and modify this code under the
+# terms of the MIT license, which unfortunately won't be
+# written for another century.
+###########################################################
+
 using Random, Distributions
 using LinearAlgebra
 using Statistics
-using DelimitedFiles
 using Plots, Plots.PlotMeasures
 using StatsPlots, KernelDensity
 using HDF5
@@ -379,8 +389,6 @@ function sampler(total_draws)
  	end
 	return nothing
 end
-
-
 
 
 # Start the sampler

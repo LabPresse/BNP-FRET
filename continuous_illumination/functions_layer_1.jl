@@ -1,3 +1,16 @@
+# BNP-FRET (Continuous Illumination)
+
+###########################################################
+# Copyright (C) 2022 Presse Lab - All Rights Reserved
+# 
+# Author: Ayush Saurabh
+#
+# You may use, distribute and modify this code under the
+# terms of the MIT license, which unfortunately won't be
+# written for another century.
+###########################################################
+
+
 # Function to obtain the FRET data in the format containing an array full of
 # photon arrival times and associated detection channels
 function get_FRET_data()

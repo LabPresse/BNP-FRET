@@ -1,3 +1,16 @@
+# BNP-FRET (Continuous Illumination)
+
+###########################################################
+# Copyright (C) 2022 Presse Lab - All Rights Reserved
+# 
+# Author: Ayush Saurabh
+#
+# You may use, distribute and modify this code under the
+# terms of the MIT license, which unfortunately won't be
+# written for another century.
+###########################################################
+
+
 # Compute generator matrix from the MCMC parameters. Generator matrix
 # consists of all the photophysical rates (for donor and acceptor relaxation,
 # and FRET) and transition rates for the biomolecule of interest.
