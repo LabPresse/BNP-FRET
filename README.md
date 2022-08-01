@@ -1,6 +1,12 @@
 # BNP-FRET: Analyze single photon smFRET data in a Bayesian nonparametrics (BNP) paradigm.
 
-BNP-FRET is a suite of software tools to analyze single photon smFRET data under continuous and pulsed illumination. It helps learn distributions over parameters of interest: the number of states a biomolecule transitions through and associated transition rates. The tools can be used in a simple plug and play manner. 
+BNP-FRET is a suite of software tools to analyze single photon smFRET data under continuous and pulsed illumination. It helps learn distributions over parameters of interest: the number of states a biomolecule transitions through and associated transition rates. The tools can be used in a simple plug and play manner. Check the following set of papers to see details of all the mathematics involved in the development of BNP-FRET:
+
+https://biorxiv.org/cgi/content/short/2022.07.20.500887v1
+
+https://biorxiv.org/cgi/content/short/2022.07.20.500888v1
+
+https://biorxiv.org/cgi/content/short/2022.07.20.500892v1
 
 All the codes are written in Julia language for high performance and its open-source/free availability. Julia also allows easy parallelization of all the codes.
 
