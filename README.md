@@ -25,7 +25,7 @@ Also, see the image below for an example of the package installation process in 
 ## Functions and Output
 Each specialization of BNP-FRET (continuous or pulsed illumination) is organized in such a way that all the user input is accomplished via the "input_parameters.jl" file. It can be used to provide file names for experimental FRET data and sampler output, background rates for each detection channel, crosstalk probabilities, and plotting options. See the respective files for more details (they are well-commented). The functions involved in the both specializations of BNP-FRET and their respective outputs are briefly described below:
 
-### Continuous Illumination
+### 1. Continuous Illumination
 
 The functions used to perform all the computations are organized in a hierarchical structure. The file "sampler_continuous_illumination.jl" contains the main sampler. All the functions called in that file are written in the file "functions_layer_1.jl". Similarly, all the functions called in the file "functions_layer_1.jl" are in file "functions_layer_2.jl". Any new set of functions can be introduced by following the same heirarchical structure. A brief description of all the functions is given below in the sequence they are called:
 
@@ -100,4 +100,4 @@ Furthemore, the sampler output can be visualized using the plotting options in t
 
 ![Screenshot from 2022-08-01 02-30-28](https://user-images.githubusercontent.com/87823118/182118887-f2f7426d-0508-4e8f-8bf3-dd0846466f22.png)
 
-### Pulsed Illumination
+### 2. Pulsed Illumination
