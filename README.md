@@ -12,7 +12,7 @@ All the codes are written in Julia language for high performance/speed and its o
 
 https://julialang.org/
 
-Once the julia language has been installed, some essential julia packages are required to be added that help simplify linear algebra and statistical calculations, and plotting. To add these package via julia REPL, first enter the julia package manager by executing "]" command in the REPL. Then simply execute the following command to install all these packages at the same time. 
+Once the julia language has been installed, some essential julia packages are required to be added that help simplify linear algebra and statistical calculations, and plotting. To add these packages via julia REPL, first enter the julia package manager by executing "]" command in the REPL. Then simply execute the following command to install all these packages at the same time. 
 
 ```add Distributions LinearAlgebra Statistics Plots StatsPlots KernelDensity HDF5```
 
