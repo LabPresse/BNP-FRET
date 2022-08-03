@@ -101,3 +101,5 @@ Furthemore, the sampler output can be visualized using the plotting options in t
 ![Screenshot from 2022-08-01 02-30-28](https://user-images.githubusercontent.com/87823118/182118887-f2f7426d-0508-4e8f-8bf3-dd0846466f22.png)
 
 ### 2. Pulsed Illumination
+
+
