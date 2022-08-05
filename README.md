@@ -22,6 +22,19 @@ Also, see the image below for an example of the package installation process in 
 
 ![Screenshot from 2022-08-01 13-00-40](https://user-images.githubusercontent.com/87823118/182234995-db174ea5-3157-4b8c-98b9-dd0aeabc4399.png)
 
+## A brief description of the sampler:
+
+The samplers here execute a Markov Chain Monte Carlo (MCMC) algorithm (Gibbs) where samples for each parameter of interest are generated sequentially from their corresponding probability distributions (posterior). First, the sampler creates/initiates arrays to store all the samples, posterior values, and acceptance rates for proposed samples. Next, new samples are then iteratively proposed using proposal (normal) distributions for each parameter, to be accepted or rejected by the Metropolis-Hastings step if direct sampling is not available. If accepted, the proposed sample is stored in the arrays otherwise the previous sample is stored at the same MCMC iteraion. 
+
+The variance of the proposal distribution typically decides how often proposals are accepted/rejected. A larger covariance or movement away from the previous sample would lead to a larger change in likelihood/posterior values. Since the sampler prefers movement towards high probability regions, a larger movement towards low probability regions would lead to likely rejection of the sample compared to smaller movement.
+
+The collected samples can then be used to compute statistical quantities and plot probability distributions. The plotting function used by the sampler in this code allows monitoring of posterior values, most probable model for the molecule, and distributions over transition rates and FRET efficiencies.
+
+As mentioned before, sampler prefers movement towards higher probability regions of the posterior distribution. This means that if parameters are initialized in low probability regions of the posterior, which is typically the case, the posterior would appear to increase initially for many iterations (hundreds to thousands depending on the complexity of the model). This initial period is called burn-in. After burn-in, convergence is achieved where the posterior would typically fluctuate around some mean/average value. The convergence typically indicates that the sampler has reached the maximum of the posterior distribution (the most probability region), that is, sampler generates most samples from higher probability region. In other words, given a large collection of samples, the probability density in a region of parameter space is proportional to the number of samples collected from that region. 
+ 
+All the samples collected during burn-in are usually ignored when computing statistical properties and presenting the final posterior distribution. 
+
+
 ## Functions and Output
 Each specialization of BNP-FRET (continuous or pulsed illumination) is organized in such a way that all the user input is accomplished via the "input_parameters.jl" file. It can be used to provide file names for experimental FRET data and sampler output, background rates for each detection channel, crosstalk probabilities, and plotting options. See the respective files for more details (they are well-commented). The functions involved in the both specializations of BNP-FRET and their respective outputs are briefly described below:
 
