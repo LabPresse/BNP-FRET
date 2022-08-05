@@ -22,7 +22,7 @@ Also, see the image below for an example of the package installation process in 
 
 ![Screenshot from 2022-08-01 13-00-40](https://user-images.githubusercontent.com/87823118/182234995-db174ea5-3157-4b8c-98b9-dd0aeabc4399.png)
 
-## A brief description of the sampler:
+## A Brief Description of the Sampler
 
 The samplers here execute a Markov Chain Monte Carlo (MCMC) algorithm (Gibbs) where samples for each parameter of interest are generated sequentially from their corresponding probability distributions (posterior). First, the sampler creates/initiates arrays to store all the samples, posterior values, and acceptance rates for proposed samples. Next, new samples are then iteratively proposed using proposal (normal) distributions for each parameter, to be accepted or rejected by the Metropolis-Hastings step if direct sampling is not available. If accepted, the proposed sample is stored in the arrays otherwise the previous sample is stored at the same MCMC iteraion. 
 
