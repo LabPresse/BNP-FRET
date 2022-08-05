@@ -1,4 +1,4 @@
-# BNP-FRET: Analyze single photon smFRET data in a Bayesian nonparametrics (BNP) paradigm.
+# BNP-FRET: Analyze single photon smFRET data in a Bayesian nonparametrics (BNP) paradigm
 
 BNP-FRET is a suite of software tools to analyze single photon smFRET data under continuous and pulsed illumination. It implements Markov chain Monte Carlo (MCMC) algorithms to learn distributions over parameters of interest: the number of states a biomolecule transitions through and associated transition rates. These tools can be used in a simple plug and play manner. Check the following set of papers to see details of all the mathematics involved in the development of BNP-FRET:
 
