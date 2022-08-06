@@ -2,14 +2,14 @@
 
 ###########################################################
 # Copyright (C) 2022 Presse Lab - All Rights Reserved
-# 
+#
 # Author: Ayush Saurabh
 #
 # You may use, distribute and modify this code under the
-# terms of the MIT license, which unfortunately won't be
-# written for another century.
+# terms of the MIT license.
 ###########################################################
 
+# These julia packages help simplify calculations and plotting.
 using Random, Distributions
 using LinearAlgebra
 using Statistics
@@ -22,18 +22,63 @@ include("input_parameters.jl")
 include("functions_layer_1.jl")
 include("functions_layer_2.jl")
 
-# Globally defined FRET data.
+###############################################################################
+# A brief description of the sampler:
+#
+# The sampler function below executes a Markov Chain Monte Carlo (MCMC)
+# algorithm (Gibbs) where samples for each parameter of interest are generated
+# sequentially from their corresponding probability distributions (posterior).
+# First, the sampler creates/initiates arrays to store all the samples,
+# posterior values, and acceptance rates for proposed samples. Next, new
+# samples are then iteratively proposed using proposal (normal) distributions
+# for each parameter, to be accepted or rejected by the Metropolis-Hastings
+# step. If accepted, the proposed sample is stored in the arrays otherwise the
+# previous sample is stored at the same MCMC iteration.
+#
+# The variance of the proposal distribution typically decides how often
+# proposals are accepted/rejected. A larger covariance or movement away from
+# the previous sample would lead to a larger change in likelihood/posterior
+# values. Since the sampler prefers movement towards high probability regions,
+# a larger movement towards low probability regions would lead to likely
+# rejection of the sample compared to smaller movement.
+#
+# The collected samples can then be used to compute statistical quantities and
+# plot probability distributions. The plotting function used by the sampler
+# in this code allows monitoring of posterior values, most probable model for
+# the molecule, and distributions over transition rates and FRET efficiencies.
+#
+# As mentioned before, sampler prefers movement towards higher probability
+# regions of the posterior distribution. This means that if parameters are
+# initialized in low probability regions of the posterior, which is typically
+# the case, the posterior would appear to increase initially for many
+# iterations (hundreds to thousands depending on the complexity of the model).
+# This initial period is called burn-in. After burn-in, convergence is achieved
+# where the posterior would typically fluctuate around some mean/average value.
+# The convergence typically indicates that the sampler has reached the maximum
+# of the posterior distribution (the most probability region), that is, sampler
+# generates most samples from higher probability region. In other words, given
+# a large collection of samples, the probability density in a region of
+# parameter space is proportional to the number of samples collected from that
+# region.
+#
+# All the samples collected during burn-in are usually ignored
+# when computing statistical properties and presenting the final posterior
+# distribution.
+#
+###############################################################################
+
+# Globally defined FRET data. Import from data files in HDF5 format.
 photon_arrival_times, detection_channels = get_FRET_data()
 
 # Sampler utilizing Gibbs algorithm with Metropolis-Hastings steps
 function sampler(total_draws)
 
- 	# Create arrays storing all the generated MCMC samples, log posterior
+ 	# Create arrays for storing all the generated MCMC samples, log posterior
 	# values, and acceptance rates.
 	mcmc_samples = zeros(n_parameters+1, total_draws)
-	# +1 above is for storing the "n_system_states".
+	# +1 above is for storing the variable "n_system_states".
 	mcmc_log_posteriors = zeros(n_parameters+1, total_draws)
-	# +1 above for storing joint posterior.
+	# +1 above for storing full joint posterior.
 	mcmc_acceptance_rates = zeros(n_parameters, total_draws)
 
 	# Since MCMC chains can be restarted at any time, we define the variable
@@ -127,21 +172,25 @@ function sampler(total_draws)
 	end
 
  	# log-Posterior associated with non-parametrics parameters
-	offset = 3 + max_n_system_states^2 #new offset for loads
-    	prior_success_probability = 1.0/(1.0 + ((max_n_system_states - 1)/
-													expected_n_system_states))
-	for i in 1:max_n_system_states
-		param = offset + i
-		if loads_active[i] != 0
-			old_log_prior = log(prior_success_probability)
-		elseif loads_active[i] == 0
-			old_log_prior = log(1.0 - prior_success_probability)
+	if modeling_choice == "nonparametric"
+
+		offset = 3 + max_n_system_states^2 #new offset for loads
+    		prior_success_probability = 1.0/(1.0 + ((max_n_system_states - 1)/
+														expected_n_system_states))
+		for i in 1:max_n_system_states
+			param = offset + i
+			if loads_active[i] != 0
+				old_log_prior = log(prior_success_probability)
+			elseif loads_active[i] == 0
+				old_log_prior = log(1.0 - prior_success_probability)
+			end
+
+			old_log_conditional_posterior = old_log_prior + old_log_likelihood
+			mcmc_log_posteriors[param, last_draw] = old_log_conditional_posterior
+			mcmc_acceptance_rates[param, last_draw] =
+					accepted_samples_MH_counter[param]/convert(Float64, last_draw)
 		end
 
-		old_log_conditional_posterior = old_log_prior + old_log_likelihood
-		mcmc_log_posteriors[param, last_draw] = old_log_conditional_posterior
-		mcmc_acceptance_rates[param, last_draw] =
-				accepted_samples_MH_counter[param]/convert(Float64, last_draw)
 	end
 
 	# Add contribution from all the priors to get full joint posterior
@@ -159,7 +208,7 @@ function sampler(total_draws)
 	print_and_plotting(last_draw, mcmc_samples, mcmc_log_posteriors,
 														mcmc_acceptance_rates)
 
-	# MCMC Part Starts Here.
+	# MCMC (Gibbs algorithm) Part Starts Here.
 	for draw in last_draw+1:total_draws
 
 		# Initialize the parameters at current draw
@@ -281,99 +330,107 @@ function sampler(total_draws)
 		# as for the parameters. No Metropolis-Hastings required since direct
 		# sampling is available.
 		#
-		offset = 3 + max_n_system_states^2
-		for i in 1:max_n_system_states
+		if modeling_choice == "nonparametric"
 
-			param = offset + i
+			offset = 3 + max_n_system_states^2
+			for i in 1:max_n_system_states
 
- 			# Initialize proposed loads array
-			proposed_loads_active = copy(loads_active)
+				param = offset + i
 
-			if proposed_loads_active[i] == 0
+ 				# Initialize proposed loads array
+				proposed_loads_active = copy(loads_active)
 
-				log_likelihood_inactive = old_log_likelihood
-				log_p_inactive = log_likelihood_inactive + log(1.0 -
-													prior_success_probability)
+				if proposed_loads_active[i] == 0
 
-				proposed_loads_active[i] = i
-				n_system_states = size(filter(x-> x != 0,
-													proposed_loads_active))[1]
+					log_likelihood_inactive = old_log_likelihood
+					log_p_inactive = log_likelihood_inactive + log(1.0 -
+											prior_success_probability)
 
-				log_likelihood_active = get_log_likelihood(vec(old_parameters),
-								      proposed_loads_active, n_system_states)
+					proposed_loads_active[i] = i
+					n_system_states = size(filter(x-> x != 0,
+											proposed_loads_active))[1]
 
-				log_p_active = log_likelihood_active +
-												log(prior_success_probability)
+					log_likelihood_active = get_log_likelihood(
+										vec(old_parameters),
+									   	proposed_loads_active, n_system_states)
 
-			elseif proposed_loads_active[i] == i
+					log_p_active = log_likelihood_active +
+											log(prior_success_probability)
 
-				log_likelihood_active = old_log_likelihood
-				log_p_active = log_likelihood_active +
-												log(prior_success_probability)
+				elseif proposed_loads_active[i] == i
 
- 				# log-Posterior associated with old parameters
-				proposed_loads_active[i] = 0
-				n_system_states = size(filter(x-> x != 0,
-													proposed_loads_active))[1]
+					log_likelihood_active = old_log_likelihood
+					log_p_active = log_likelihood_active +
+										log(prior_success_probability)
 
-				if n_system_states > 0
+ 					# log-Posterior associated with old parameters
+					proposed_loads_active[i] = 0
+					n_system_states = size(filter(x-> x != 0,
+											proposed_loads_active))[1]
 
-					log_likelihood_inactive = get_log_likelihood(
+					if n_system_states > 0
+
+						log_likelihood_inactive = get_log_likelihood(
 									vec(old_parameters),proposed_loads_active,
-																n_system_states)
+														n_system_states)
 
-					log_p_inactive = log_likelihood_inactive +
+						log_p_inactive = log_likelihood_inactive +
 											log(1.0 - prior_success_probability)
 
-				elseif n_system_states == 0
+					elseif n_system_states == 0
 
-					# Posterior is 0 for a zero-state model
-					log_p_inactive = -Inf
+						# Posterior is 0 for a zero-state model. So logarithm
+						# of posterior is -Inf
+						#
+						log_p_inactive = -Inf
+
+					end
 
 				end
 
+				# The following procedure helps avoid overflow issues
+				max_val = max(log_p_active, log_p_inactive)
+				p_active = exp(log_p_active-max_val)
+				p_inactive = exp(log_p_inactive-max_val)
+
+				# Probability vector to activate or deactivate a load
+				p_load = [p_active, p_inactive]
+				# Normalize this probability vector
+				p_load = p_load ./ sum(p_load)
+
+				loads_active[i] =  rand(Categorical(p_load), 1)[1]
+				if loads_active[i] == 1 #Active load
+
+					loads_active[i] = i
+					old_log_likelihood = log_likelihood_active
+					old_log_conditional_posterior = log_p_active
+
+				elseif loads_active[i] == 2 #Inactive load
+
+					loads_active[i] = 0
+					old_log_likelihood = log_likelihood_inactive
+					old_log_conditional_posterior = log_p_inactive
+
+				end
+
+
+				n_system_states = size(filter(x-> x != 0, loads_active))[1]
+				accepted_samples_MH_counter[param] =
+									accepted_samples_MH_counter[param] + 1.0
+				old_parameters[param] = convert(Float64, loads_active[i])
+
+ 				mcmc_samples[param, draw] = old_parameters[param]
+				mcmc_log_posteriors[param, draw] = old_log_conditional_posterior
+				# All samples accepted due to direct sampling
+				mcmc_acceptance_rates[param, draw] = 1.0
 			end
 
-			# The following procedure helps avoid overflow issues
-			max_val = max(log_p_active, log_p_inactive)
-			p_active = exp(log_p_active-max_val)
-			p_inactive = exp(log_p_inactive-max_val)
-
-			# Probability vector to activate or deactivate a load
-			p_load = [p_active, p_inactive]
-			# Normalize this probability vector
-			p_load = p_load ./ sum(p_load)
-
-			loads_active[i] =  rand(Categorical(p_load), 1)[1]
-			if loads_active[i] == 1 #Active load
-
-				loads_active[i] = i
-				old_log_likelihood = log_likelihood_active
-				old_log_conditional_posterior = log_p_active
-
-			elseif loads_active[i] == 2 #Inactive load
-
-				loads_active[i] = 0
-				old_log_likelihood = log_likelihood_inactive
-				old_log_conditional_posterior = log_p_inactive
-
-			end
-
-
-			n_system_states = size(filter(x-> x != 0, loads_active))[1]
-			accepted_samples_MH_counter[param] =
-										accepted_samples_MH_counter[param] + 1.0
-			old_parameters[param] = convert(Float64, loads_active[i])
-
- 			mcmc_samples[param, draw] = old_parameters[param]
-			mcmc_log_posteriors[param, draw] = old_log_conditional_posterior
-			# All samples accepted due to direct sampling
-			mcmc_acceptance_rates[param, draw] = 1.0
+		# End of nonparametric if statement
 		end
 
  		# Full joint posterior. Sequentially add log-priors to log-likelihood
 		log_full_posterior = get_log_full_posterior(draw, old_log_likelihood,
-													loads_active, mcmc_samples)
+												loads_active, mcmc_samples)
 
 		# Update MCMC data arrays
 		mcmc_log_posteriors[n_parameters+1, draw] = log_full_posterior
@@ -381,12 +438,14 @@ function sampler(total_draws)
 
 		# Save MCMC Data
 		save_mcmc_data(draw, mcmc_samples, mcmc_log_posteriors,
-														mcmc_acceptance_rates)
+											mcmc_acceptance_rates)
 		# Print and plot MCMC data
 		print_and_plotting(draw, mcmc_samples, mcmc_log_posteriors,
-														mcmc_acceptance_rates)
+											mcmc_acceptance_rates)
 
+	# Ending of the for loop
  	end
+
 	return nothing
 end
 

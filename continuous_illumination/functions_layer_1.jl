@@ -2,7 +2,7 @@
 
 ###########################################################
 # Copyright (C) 2022 Presse Lab - All Rights Reserved
-# 
+#
 # Author: Ayush Saurabh
 #
 # You may use, distribute and modify this code under the
@@ -60,29 +60,28 @@ function initialize_params()
 	# arrival time while correcting for crosstalk and background.
 	#
 	data_donor = []
-        data_acceptor = []
+	data_acceptor = []
+	for i in 1:total_photons
 
-        for i in 1:total_photons
+     	if detection_channels[i] == 1 # Acceptor
+			data_acceptor = vcat(data_acceptor, photon_arrival_times[i])
+       	end
 
-            if detection_channels[i] == 1 # Acceptor
-                data_acceptor = vcat(data_acceptor, photon_arrival_times[i])
-            end
+       	if detection_channels[i] == 2 # Donor
+			data_donor = vcat(data_donor, photon_arrival_times[i])
+       	end
 
-            if detection_channels[i] == 2 # Donor
-                data_donor = vcat(data_donor, photon_arrival_times[i])
-            end
-
-        end
+   	end
 
 	# Duration of FRET trace.
 	duration_FRET_trace = photon_arrival_times[total_photons] -
-														photon_arrival_times[1]
+											photon_arrival_times[1]
 
 	# First correct for background.
 	corrected_acceptor_photons = size(data_acceptor)[1] - lambda_bg[1] *
-															duration_FRET_trace
+											duration_FRET_trace
 	corrected_donor_photons = size(data_donor)[1] - lambda_bg[2] *
-															duration_FRET_trace
+											duration_FRET_trace
 
 	# Then correct for detection efficiency/crosstalk.
 	corrected_total_photons = (RCM[1, 1]*corrected_acceptor_photons +
@@ -118,21 +117,28 @@ function initialize_params()
 
 	# Initialize loads for nonparametrics
 	offset = 3 + max_n_system_states^2
-	prior_success_probability = 1.0/(1.0 + ((max_n_system_states - 1)/
+	if modeling_choice == "nonparametric"
+		prior_success_probability = 1.0/(1.0 + ((max_n_system_states - 1)/
 													expected_n_system_states))
-	p_load = [prior_success_probability, 1.0 - prior_success_probability]
-	n_system_states = 0
-	for i in 1:max_n_system_states
-		initial_parameters[offset+i] = rand(Categorical(p_load), 1)[1]
-		if  initial_parameters[offset+i]== 1 #Active
-			initial_parameters[offset+i] = i
-			n_system_states = n_system_states + 1
-		elseif initial_parameters[offset+i] == 2 #Inactive
-			initial_parameters[offset+i] = 0
-			if i == max_n_system_states && n_system_states == 0
+		p_load = [prior_success_probability, 1.0 - prior_success_probability]
+		n_system_states = 0
+		for i in 1:max_n_system_states
+			initial_parameters[offset+i] = rand(Categorical(p_load), 1)[1]
+			if  initial_parameters[offset+i]== 1 #Active
 				initial_parameters[offset+i] = i
+				n_system_states = n_system_states + 1
+			elseif initial_parameters[offset+i] == 2 #Inactive
+				initial_parameters[offset+i] = 0
+				if i == max_n_system_states && n_system_states == 0
+					initial_parameters[offset+i] = i
+				end
 			end
 		end
+	else
+		for i in 1:expected_n_system_states
+			initial_parameters[offset+i] = i
+		end
+		n_system_states = expected_n_system_states
 	end
 
 	return initial_parameters
@@ -299,6 +305,8 @@ function print_and_plotting(current_draw, mcmc_samples, mcmc_log_posteriors,
  	if current_draw == 1
 
 		println( "    ")
+		println( "Modeling choice = ", modeling_choice)
+		println( "    ")
 		println( "Maximum number of system states = ", max_n_system_states)
 		println( "    ")
 		println( "Expected number of system states = ",
@@ -458,7 +466,7 @@ end
 function check_for_existing_mcmc_data(mcmc_samples,
 									mcmc_log_posteriors, mcmc_acceptance_rates)
 
-	file_name = string(working_directory, "mcmc_output_", filename_prefix, 
+	file_name = string(working_directory, "mcmc_output_", filename_prefix,
 											total_photons, filename_suffix)
 	if isfile(file_name) == true
 
@@ -492,7 +500,7 @@ function save_mcmc_data(current_draw, mcmc_samples,
 									mcmc_log_posteriors, mcmc_acceptance_rates)
 
 	# Save the data in HDF5 format.
-	file_name = string(working_directory, "mcmc_output_", filename_prefix, 
+	file_name = string(working_directory, "mcmc_output_", filename_prefix,
 											total_photons, filename_suffix)
 
 	fid = h5open(file_name,"w")

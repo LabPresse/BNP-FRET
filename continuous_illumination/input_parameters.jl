@@ -2,7 +2,10 @@
 # All the time scales are set in nanosecond units.
 
 # Directory containing FRET traces
-working_directory = "/home/username/BNP-FRET/"
+working_directory =
+         "/home/singularity/dropbox/bayesianCodes/julia/multiFRET/BNP-FRET/"
+#working_directory =
+#        "/home/mbgnjasb/Dropbox (ASU)/bayesianCodes/julia/multiFRET/BNP-FRET/"
 
 
 # Input data files are named using the convention "biomolecule_label.h5".
@@ -16,7 +19,7 @@ filename_suffix = ".h5"
 # Total photons from the FRET trace to be used for analysis
 total_photons = 1000
 
-# Experimental Parameters
+# =================== Experimental Parameters ========================
 n_channels = 2
 
 # Acceptor channels are labeled with odd numbers (1, 3, ..)
@@ -28,12 +31,9 @@ lambda_bg[1] = 0.4672e-6 #Acceptor channel
 lambda_bg[2] = 0.2828e-6 #Donor channel
 
 
-# ============== Crosstalk factors ===================
-# phi[i, j] represents probability for photons intended
-# for channel i to enter channel j. It incorporates
-# effects of crosstalk, detection efficiency, and
-# quantum yield.
-# ====================================================
+# Crosstalk factors: phi[i, j] represents probability for photons intended
+# for channel i to enter channel j. It incorporates effects of crosstalk, 
+# detection efficiency, and quantum yield.
 #
 phi = zeros(n_channels, n_channels)
 phi[1, 1] = 0.835897
@@ -61,9 +61,23 @@ typical_system_transition_rate = 1.0/typical_time_scale
 
 
 
-# Nonparametrics parameters.
-max_n_system_states = 6
+# ==================== Nonparametrics Parameters =========================
+
+# Make a modeling choice, that is, parametric or nonparametric. To keep the
+# number of system states fixed in the model, choose "parametric". If the 
+# number of system states is unknown, please choose "nonparametric".
+modeling_choice = "nonparametric" 
+
 expected_n_system_states = 2
+# Choose maximum possible number of system states much larger than the 
+# expected number above. If the sampler stays near the maximum number of system
+# states, please increase this maximum number below and restart the sampler.
+#
+# However, increasing this value increases computational cost. Therefore, to
+# keep the computational expense low, a few initial runs would be  helpful 
+# in choosing the optimum value.
+#
+max_n_system_states = 6 
 
 
 # Markov Chain Monte Carlo (MCMC) Parmeters. These parameters set
@@ -73,6 +87,6 @@ expected_n_system_states = 2
 n_rates = 1 + n_dyes + max_n_system_states^2
 n_parameters = n_rates + max_n_system_states
 
-# Plotting options.
+# ================ Plotting Options =================================
 turn_on_plotting = true # Choose true or false
 plotting_frequency = 2
